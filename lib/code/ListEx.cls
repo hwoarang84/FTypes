@@ -137,9 +137,13 @@ Public Function Add(ByRef Item As Variant) As ListEx
     
     Set Add = Me
     
-    If p_Array.lPointer Then ArrayRedim p_Array, p_Array.uBounds(0).lElements + 1& Else ArrayCreateVector p_Array, VarType(Item), 1&
+    If (VarType(Item) And vbArray) <> vbArray Then
+        
+        If p_Array.lPointer Then ArrayRedim p_Array, p_Array.uBounds(0).lElements + 1& Else ArrayCreateVector p_Array, VarType(Item), 1&
+        
+        ArrayElementSet p_Array, VarPtr(Count + L_NG), Item
     
-    ArrayElementSet p_Array, VarPtr(Count + L_NG), Item
+    End If
 
 End Function
 
@@ -248,53 +252,25 @@ Public Function Distinct() As ListEx
         VariantZero v1
         VariantZero v2
         
-        Resize x
+        ArrayRedim p_Array, x
     
     End If
 
 End Function
 
-Public Function Filter(ParamArray Values()) As ListEx
-    
-    Dim i As Long
-    Dim j As Long
-    Dim x As Long
-    Dim u As Long
-    Dim v As Variant
+Public Function Filter(ByRef Values As Variant) As ListEx
     
     Set Filter = Me
     
-    u = UBound(Values)
+    If (VarType(Values) And vbArray) = vbArray Then FilterInternal Values, False, False Else FilterInternal Array(Values), False, False
+
+End Function
+
+Public Function FilterAt(ByRef Indexes As Variant) As ListEx
     
-    If u > L_NG Then
-        
-        VariantSetType v, p_Array.lVarType
-        
-        For i = 0& To Count + L_NG
-            
-            ArrayElementGet p_Array, VarPtr(i), v
-            
-            For j = 0& To u
-                
-                If v = Values(j) Then
-                    
-                    If i <> x Then Item(x) = v
-                    
-                    x = x + 1&
-                    
-                    Exit For
-                
-                End If
-            
-            Next j
-        
-        Next i
-        
-        VariantZero v
-        
-        ArrayRedim p_Array, x
+    Set FilterAt = Me
     
-    End If
+    If (VarType(Indexes) And vbArray) = vbArray Then FilterInternal Indexes, False, True Else FilterInternal Array(Indexes), False, True
 
 End Function
 
@@ -312,35 +288,19 @@ Public Function Parse(ByRef Value As Variant) As ListEx
 
 End Function
 
-Public Function Remove(ByVal Index As Long) As ListEx
-    
-    Dim c As Long
-    Dim i As Long
-    Dim v As Variant
+Public Function Remove(ByRef Values As Variant) As ListEx
     
     Set Remove = Me
     
-    c = Count + L_NG
+    If (VarType(Values) And vbArray) = vbArray Then FilterInternal Values, True, False Else FilterInternal Array(Values), True, False
+
+End Function
+
+Public Function RemoveAt(ByRef Indexes As Variant) As ListEx
     
-    If Index >= 0& And Index <= c Then
-        
-        VariantSetType v, p_Array.lVarType
-        
-        For i = Index To c
-            
-            If i < c Then
-                
-                If ArrayElementGet(p_Array, VarPtr(i + 1&), v) Then ArrayElementSet p_Array, VarPtr(i), v
-            
-            End If
-        
-        Next i
-        
-        VariantZero v
-        
-        ArrayRedim p_Array, c
+    Set RemoveAt = Me
     
-    End If
+    If (VarType(Indexes) And vbArray) = vbArray Then FilterInternal Indexes, True, True Else FilterInternal Array(Indexes), True, True
 
 End Function
 
@@ -478,3 +438,68 @@ Public Function ToString(Optional ByRef Delimeter As String, Optional ByVal Star
     End If
 
 End Function
+
+Private Sub FilterInternal(ByRef Values As Variant, ByVal Remove As Boolean, ByVal ValuesAreIndexes As Boolean)
+    
+    Dim f As Boolean
+    Dim i As Long
+    Dim j As Long
+    Dim x As Long
+    Dim u As Long
+    Dim v As Variant
+    
+    u = UBound(Values)
+    
+    If u > L_NG Then
+        
+        VariantSetType v, p_Array.lVarType
+        
+        For i = 0& To Count + L_NG
+            
+            ArrayElementGet p_Array, VarPtr(i), v
+            
+            f = False
+            
+            For j = 0& To u
+                
+                If ValuesAreIndexes Then
+                    
+                    If i = Values(j) Then
+                        
+                        f = True
+                        
+                        Exit For
+                    
+                    End If
+                
+                Else
+                    
+                    If v = Values(j) Then
+                        
+                        f = True
+                        
+                        Exit For
+                    
+                    End If
+                
+                End If
+            
+            Next j
+            
+            If Remove <> f Then
+                
+                If i <> x Then ArrayElementSet p_Array, VarPtr(x), v
+                
+                x = x + 1&
+            
+            End If
+        
+        Next i
+        
+        VariantZero v
+        
+        ArrayRedim p_Array, x
+    
+    End If
+
+End Sub
