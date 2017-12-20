@@ -252,7 +252,7 @@ Public Function Distinct() As ListEx
         VariantZero v1
         VariantZero v2
         
-        ArrayRedim p_Array, x
+        ArrayRedim p_Array, x + 1&
     
     End If
 
