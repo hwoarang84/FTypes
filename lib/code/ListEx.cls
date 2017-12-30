@@ -61,7 +61,7 @@ Public Property Get Item(ByVal Index As Long) As Variant
         
         VariantSetType Item, p_Array.lVarType
         
-        ArrayElementGet p_Array, VarPtr(Index), Item
+        ArrayElementGet p_Array, Index, Item
     
     End If
 
@@ -69,7 +69,7 @@ End Property
 
 Public Property Let Item(ByVal Index As Long, ByRef NewValue As Variant)
     
-    If Index >= 0& And Index < Count Then ArrayElementSet p_Array, VarPtr(Index), NewValue
+    If Index >= 0& And Index < Count Then ArrayElementSet p_Array, Index, NewValue
 
 End Property
 
@@ -127,7 +127,7 @@ Private Function TypesInterface_Parse(Value As Variant) As TypesInterface
     
     Else
         
-        If ArrayCreateVector(p_Array, VarType(Value), 1&) Then ArrayElementSet p_Array, VarPtr(0&), Value
+        If ArrayCreateVector(p_Array, VarType(Value), 1&) Then ArrayElementSet p_Array, 0&, Value
     
     End If
 
@@ -141,7 +141,7 @@ Public Function Add(ByRef Item As Variant) As ListEx
         
         If p_Array.lPointer Then ArrayRedim p_Array, p_Array.uBounds(0).lElements + 1& Else ArrayCreateVector p_Array, VarType(Item), 1&
         
-        ArrayElementSet p_Array, VarPtr(Count + L_NG), Item
+        ArrayElementSet p_Array, Count + L_NG, Item
     
     End If
 
@@ -169,7 +169,7 @@ Public Function AddRange(ByRef Range As Variant) As ListEx
                 
                 x = x + 1&
                 
-                ArrayElementSet p_Array, VarPtr(x + L_NG), Range(i)
+                ArrayElementSet p_Array, x + L_NG, Range(i)
             
             Next i
         
@@ -227,19 +227,19 @@ Public Function Distinct() As ListEx
         
         Do
             
-            ArrayElementGet p_Array, VarPtr(i), v1
+            ArrayElementGet p_Array, i, v1
             
             For j = i + 1& To u
                 
                 i = j
                 
-                ArrayElementGet p_Array, VarPtr(j), v2
+                ArrayElementGet p_Array, j, v2
                 
                 If v1 <> v2 Then
                     
                     x = x + 1&
                     
-                    ArrayElementSet p_Array, VarPtr(x), v2
+                    ArrayElementSet p_Array, x, v2
                     
                     Exit For
                 
@@ -325,7 +325,6 @@ Public Function Sort(Optional ByVal Descending As Boolean, Optional ByVal StartI
     Dim j As Long
     Dim p As Variant
     Dim s As Long
-    Dim x As Long
     Dim v1 As Variant
     Dim v2 As Variant
     Dim u As Long
@@ -340,11 +339,10 @@ Public Function Sort(Optional ByVal Descending As Boolean, Optional ByVal StartI
         If EndIndex >= s And EndIndex <= e Then e = EndIndex
         
         u = (s + e) \ 2&
-        x = VarPtr(u)
         
         VariantSetType p, p_Array.lVarType
         
-        If ArrayElementGet(p_Array, VarPtr(u), p) Then
+        If ArrayElementGet(p_Array, u, p) Then
             
             VariantSetType v1, p_Array.lVarType
             VariantSetType v2, p_Array.lVarType
@@ -358,7 +356,7 @@ Public Function Sort(Optional ByVal Descending As Boolean, Optional ByVal StartI
                     
                     u = i
                     
-                    ArrayElementGet p_Array, x, v1
+                    ArrayElementGet p_Array, u, v1
                     
                     If ((Descending = False And v1 < p) Or (Descending = True And v1 > p)) And i < e Then i = i + 1& Else Exit Do
                 
@@ -368,7 +366,7 @@ Public Function Sort(Optional ByVal Descending As Boolean, Optional ByVal StartI
                     
                     u = j
                     
-                    ArrayElementGet p_Array, x, v2
+                    ArrayElementGet p_Array, u, v2
                     
                     If ((Descending = False And p < v2) Or (Descending = True And p > v2)) And j > s Then j = j + L_NG Else Exit Do
                 
@@ -376,9 +374,9 @@ Public Function Sort(Optional ByVal Descending As Boolean, Optional ByVal StartI
                 
                 If i <= j Then
                     
-                    ArrayElementSet p_Array, x, v1
+                    ArrayElementSet p_Array, u, v1
                     u = i
-                    ArrayElementSet p_Array, x, v2
+                    ArrayElementSet p_Array, u, v2
                     
                     i = i + 1&
                     j = j + L_NG
@@ -429,7 +427,7 @@ Public Function ToString(Optional ByRef Delimeter As String, Optional ByVal Star
         
         For i = i To j
             
-            If ArrayElementGet(p_Array, VarPtr(i), v) Then ToString.Concat((v)).Concat Delimeter
+            If ArrayElementGet(p_Array, i, v) Then ToString.Concat((v)).Concat Delimeter
         
         Next i
         
@@ -456,7 +454,7 @@ Private Sub FilterInternal(ByRef Values As Variant, ByVal Remove As Boolean, ByV
         
         For i = 0& To Count + L_NG
             
-            ArrayElementGet p_Array, VarPtr(i), v
+            ArrayElementGet p_Array, i, v
             
             f = False
             
@@ -488,7 +486,7 @@ Private Sub FilterInternal(ByRef Values As Variant, ByVal Remove As Boolean, ByV
             
             If Remove <> f Then
                 
-                If i <> x Then ArrayElementSet p_Array, VarPtr(x), v
+                If i <> x Then ArrayElementSet p_Array, x, v
                 
                 x = x + 1&
             

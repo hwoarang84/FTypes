@@ -52,8 +52,8 @@ Private Declare Function SafeArrayCopy Lib "oleaut32" (ByVal lSource As Long, By
 Private Declare Function SafeArrayCopyData Lib "oleaut32" (ByVal lSource As Long, ByVal lTarget As Long) As Long
 Private Declare Function SafeArrayCreate Lib "oleaut32" (ByVal lType As Integer, ByVal lDims As Long, uBounds As Any) As Long
 Private Declare Function SafeArrayDestroy Lib "oleaut32" (ByVal lArray As Long) As Long
-Private Declare Function SafeArrayGetElement Lib "oleaut32" (ByVal lArray As Long, ByVal lIndices As Long, uValue As Any) As Long
-Private Declare Function SafeArrayPutElement Lib "oleaut32" (ByVal lArray As Long, ByVal lIndices As Long, uValue As Any) As Long
+Private Declare Function SafeArrayGetElement Lib "oleaut32" (ByVal lArray As Long, ByRef lIndices As Long, uValue As Any) As Long
+Private Declare Function SafeArrayPutElement Lib "oleaut32" (ByVal lArray As Long, ByRef lIndices As Long, uValue As Any) As Long
 Private Declare Function SafeArrayRedim Lib "oleaut32" (ByVal lArray As Long, uLastBound As TSAFEARRAYBOUND) As Long
 Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal lSource As Long, iTarget As Integer)
 Private Declare Sub PutMem2 Lib "msvbvm60" (ByVal lTarget As Long, ByVal iSource As Integer)
@@ -139,7 +139,7 @@ Public Sub ArrayDestroy(ByRef SafeArray As TSAFEARRAY)
 
 End Sub
 
-Public Function ArrayElementGet(ByRef SafeArray As TSAFEARRAY, ByVal Indexes As Long, ByRef Value As Variant) As Boolean
+Public Function ArrayElementGet(ByRef SafeArray As TSAFEARRAY, ByRef Indexes As Long, ByRef Value As Variant) As Boolean
     
     Select Case SafeArray.lVarType
         Case vbInteger To vbString, vbError, vbBoolean, vbByte: ArrayElementGet = (SafeArrayGetElement(SafeArray.lPointer, Indexes, ByVal VarPtr(Value) + 8&) = 0&)
@@ -149,7 +149,7 @@ Public Function ArrayElementGet(ByRef SafeArray As TSAFEARRAY, ByVal Indexes As 
 
 End Function
 
-Public Function ArrayElementSet(ByRef SafeArray As TSAFEARRAY, ByVal Indexes As Long, ByRef Value As Variant) As Boolean
+Public Function ArrayElementSet(ByRef SafeArray As TSAFEARRAY, ByRef Indexes As Long, ByRef Value As Variant) As Boolean
     
     On Error Resume Next
     

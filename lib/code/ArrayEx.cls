@@ -106,7 +106,7 @@ Public Property Get Item(ParamArray Indexes()) As Variant
             Erase b
         
         Else
-            ArrayElementGet p_Array, VarPtr(CLng(Indexes(0))), Item
+            ArrayElementGet p_Array, CLng(Indexes(0)), Item
         End If
     
     End If
@@ -130,7 +130,7 @@ Public Property Let Item(ParamArray Indexes(), ByRef NewValue As Variant)
             Erase b
         
         Else
-            ArrayElementSet p_Array, VarPtr(CLng(Indexes(0))), NewValue
+            ArrayElementSet p_Array, CLng(Indexes(0)), NewValue
         End If
     
     End If
@@ -201,7 +201,7 @@ Private Function TypesInterface_Parse(Value As Variant) As TypesInterface
     
     Else
         
-        If ArrayCreateVector(p_Array, VarType(Value), 1&) Then ArrayElementSet p_Array, VarPtr(0&), Value
+        If ArrayCreateVector(p_Array, VarType(Value), 1&) Then ArrayElementSet p_Array, 0&, Value
     
     End If
 
@@ -226,17 +226,17 @@ Public Function Add(ByRef Item As Variant) As ArrayEx
             
             For x = 0& To x: b(x) = BoundU(x + 1&): Next x
             
-            ArrayElementSet p_Array, VarPtr(b(0)), Item
+            ArrayElementSet p_Array, b(0), Item
             
             Erase b
         
         Else
-            ArrayElementSet p_Array, VarPtr(BoundU), Item
+            ArrayElementSet p_Array, BoundU, Item
         End If
     
     Else
         
-        If ArrayCreateVector(p_Array, VarType(Item), 1&) Then ArrayElementSet p_Array, VarPtr(0&), Item
+        If ArrayCreateVector(p_Array, VarType(Item), 1&) Then ArrayElementSet p_Array, 0&, Item
     
     End If
 
@@ -267,7 +267,7 @@ Public Function AddRange(ByRef Range As Variant) As ArrayEx
             
             For i = a.uBounds(0).lLowest To a.uBounds(0).lLowest + a.uBounds(0).lElements + L_NG
                 b(x) = b(x) + 1&
-                ArrayElementSet p_Array, VarPtr(b(0)), Range(i)
+                ArrayElementSet p_Array, b(0), Range(i)
             Next i
             
             Erase b
@@ -432,6 +432,6 @@ Private Function ArrVariantToIndexes(ByVal SourceArray As Variant, ByRef OutputA
         OutputArray(i) = SourceArray(i)
     Next i
     
-    ArrVariantToIndexes = VarPtr(OutputArray(0))
+    ArrVariantToIndexes = OutputArray(0)
 
 End Function
