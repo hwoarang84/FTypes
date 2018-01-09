@@ -55,6 +55,39 @@ Public Property Get ElementSize() As Long
 
 End Property
 
+Public Property Get IndexOf(ByRef Value As Variant) As Long
+    
+    Dim i As Long
+    Dim v As Variant
+    
+    IndexOf = L_NG
+    
+    If p_Array.lPointer Then
+        
+        VariantSetType v, p_Array.lVarType
+        
+        For i = 0& To p_Array.uBounds(0).lElements + L_NG
+            
+            If ArrayElementGet(p_Array, i, v) Then
+                
+                If v = Value Then
+                    
+                    IndexOf = i
+                    
+                    Exit For
+                
+                End If
+            
+            End If
+        
+        Next i
+        
+        VariantZero v
+    
+    End If
+
+End Property
+
 Public Property Get Item(ByVal Index As Long) As Variant
     
     If Index >= 0& And Index < Count Then
@@ -141,7 +174,7 @@ Public Function Add(ByRef Item As Variant) As ListEx
         
         If p_Array.lPointer Then ArrayRedim p_Array, p_Array.uBounds(0).lElements + 1& Else ArrayCreateVector p_Array, VarType(Item), 1&
         
-        ArrayElementSet p_Array, Count + L_NG, Item
+        ArrayElementSet p_Array, p_Array.uBounds(0).lElements + L_NG, Item
     
     End If
 
@@ -220,7 +253,7 @@ Public Function Distinct() As ListEx
         
         Sort
         
-        u = Count + L_NG
+        u = p_Array.uBounds(0).lElements + L_NG
         
         VariantSetType v1, p_Array.lVarType
         VariantSetType v2, p_Array.lVarType
