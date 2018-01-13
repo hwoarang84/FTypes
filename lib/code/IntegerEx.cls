@@ -160,6 +160,43 @@ Public Function Range(ByVal MinValue As Integer, ByVal MaxValue As Integer) As I
 
 End Function
 
+Public Function ShiftL(ByVal Bits As Integer) As IntegerEx
+    
+    On Error GoTo ErrHandler
+    
+    Dim b As Long
+    Dim c As Integer
+    Dim m As Integer
+    
+    Set ShiftL = Me
+    
+    c = 15 - Bits
+    
+    Do While c >= 0
+        m = m + (2 ^ c)
+        c = c - 1
+    Loop
+    
+    p_Value = p_Value And m
+    
+    If (15 - Bits) = 15 Then b = p_Value And &H8000 Else b = p_Value And (2 ^ (15 - Bits))
+    
+    If b > 0 Then p_Value = ((p_Value Xor b) * (2 ^ Bits)) Or &H8000 Else p_Value = p_Value * (2 ^ Bits)
+
+ErrHandler:
+
+End Function
+
+Public Function ShiftR(ByVal Bits As Integer) As IntegerEx
+    
+    On Error Resume Next
+    
+    Set ShiftR = Me
+    
+    If (p_Value And &H8000) = &H8000 Then p_Value = ((p_Value And I_MX) \ 2 ^ Bits) + 1 * (2 ^ (15 - Bits)) Else p_Value = p_Value \ 2 ^ Bits
+
+End Function
+
 Public Function ToArray() As ListEx
     
     Set ToArray = New ListEx
