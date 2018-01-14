@@ -341,11 +341,7 @@ Public Function Resize(ByVal NewUpperBound As Long) As ListEx
     
     Set Resize = Me
     
-    If p_Array.lPointer Then
-        
-        If NewUpperBound >= 0& And NewUpperBound < p_Array.uBounds(0&).lElements Then ArrayRedim p_Array, NewUpperBound + 1&
-    
-    End If
+    If p_Array.lPointer > 0& And NewUpperBound >= 0& Then ArrayRedim p_Array, NewUpperBound + 1&
 
 End Function
 
