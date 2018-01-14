@@ -28,6 +28,7 @@ Public Type TSAFEARRAY
     lData As Long
     lPointer As Long
     lVarType As Long
+    bSorted As Boolean
     uBounds() As TSAFEARRAYBOUND
 End Type
 
@@ -202,7 +203,9 @@ Public Sub ArrayPtr(ByRef SafeArray As TSAFEARRAY, ByVal SourceArrayPtr As Long,
 
 End Sub
 
-Public Sub ArrayRedim(ByRef SafeArray As TSAFEARRAY, ByVal NewCount As Long)
+Public Sub ArrayRedim(ByRef SafeArray As TSAFEARRAY, ByVal NewCount As Long, Optional ByVal HoldSortedFlag As Boolean)
+    
+    If Not HoldSortedFlag Then SafeArray.bSorted = False
     
     SafeArray.uBounds(0&).lElements = NewCount
     

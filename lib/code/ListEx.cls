@@ -102,13 +102,23 @@ End Property
 
 Public Property Let Item(ByVal Index As Long, ByRef NewValue As Variant)
     
-    If Index >= 0& And Index < Count Then ArrayElementSet p_Array, Index, NewValue
+    If Index >= 0& And Index < Count Then
+        
+        If ArrayElementSet(p_Array, Index, NewValue) Then p_Array.bSorted = False
+    
+    End If
 
 End Property
 
 Public Property Get Pointer() As Long
     
     Pointer = TypesInterface_Pointer
+
+End Property
+
+Public Property Get Sorted() As Boolean
+    
+    Sorted = p_Array.bSorted
 
 End Property
 
@@ -285,7 +295,7 @@ Public Function Distinct() As ListEx
         VariantZero v1
         VariantZero v2
         
-        ArrayRedim p_Array, x + 1&
+        ArrayRedim p_Array, x + 1&, True
     
     End If
 
@@ -430,6 +440,8 @@ Public Function Sort(Optional ByVal Descending As Boolean, Optional ByVal StartI
         End If
         
         VariantZero p
+        
+        p_Array.bSorted = True
     
     End If
 
@@ -525,7 +537,7 @@ Private Sub FilterInternal(ByRef Values As Variant, ByVal Remove As Boolean, ByV
         
         VariantZero v
         
-        ArrayRedim p_Array, x
+        ArrayRedim p_Array, x, True
     
     End If
 
