@@ -135,6 +135,8 @@ Public Sub ArrayDestroy(ByRef SafeArray As TSAFEARRAY)
     
     SafeArrayDestroy SafeArray.lPointer
     
+    Erase SafeArray.uBounds
+    
     RtlZeroMemory SafeArray, Len(SafeArray)
 
 End Sub
