@@ -64,25 +64,31 @@ Public Property Get IndexOf(ByRef Value As Variant) As Long
     
     If p_Array.lPointer Then
         
-        VariantSetType v, p_Array.lVarType
+        i = p_Array.uBounds(0).lElements
         
-        For i = 0& To p_Array.uBounds(0).lElements + L_NG
+        If i Then
             
-            If ArrayElementGet(p_Array, i, v) Then
+            VariantSetType v, p_Array.lVarType
+            
+            For i = 0& To i + L_NG
                 
-                If v = Value Then
+                If ArrayElementGet(p_Array, i, v) Then
                     
-                    IndexOf = i
+                    If v = Value Then
+                        
+                        IndexOf = i
+                        
+                        Exit For
                     
-                    Exit For
+                    End If
                 
                 End If
             
-            End If
+            Next i
+            
+            VariantZero v
         
-        Next i
-        
-        VariantZero v
+        End If
     
     End If
 
@@ -119,6 +125,12 @@ End Property
 Public Property Get Sorted() As Boolean
     
     Sorted = p_Array.bSorted
+
+End Property
+
+Friend Property Let Sorted(ByVal NewValue As Boolean)
+    
+    p_Array.bSorted = NewValue
 
 End Property
 
@@ -229,6 +241,8 @@ End Function
 Public Function Clone() As ListEx
     
     Set Clone = TypesInterface_Clone
+    
+    Clone.Sorted = p_Array.bSorted
 
 End Function
 
@@ -261,41 +275,45 @@ Public Function Distinct() As ListEx
     
     If p_Array.lPointer Then
         
-        Sort
-        
         u = p_Array.uBounds(0).lElements + L_NG
         
-        VariantSetType v1, p_Array.lVarType
-        VariantSetType v2, p_Array.lVarType
-        
-        Do
+        If u >= 0& Then
             
-            ArrayElementGet p_Array, i, v1
+            Sort
             
-            For j = i + 1& To u
-                
-                i = j
-                
-                ArrayElementGet p_Array, j, v2
-                
-                If v1 <> v2 Then
-                    
-                    x = x + 1&
-                    
-                    ArrayElementSet p_Array, x, v2
-                    
-                    Exit For
-                
-                End If
+            VariantSetType v1, p_Array.lVarType
+            VariantSetType v2, p_Array.lVarType
             
-            Next j
+            Do
+                
+                ArrayElementGet p_Array, i, v1
+                
+                For j = i + 1& To u
+                    
+                    i = j
+                    
+                    ArrayElementGet p_Array, j, v2
+                    
+                    If v1 <> v2 Then
+                        
+                        x = x + 1&
+                        
+                        ArrayElementSet p_Array, x, v2
+                        
+                        Exit For
+                    
+                    End If
+                
+                Next j
+            
+            Loop While i < u
+            
+            VariantZero v1
+            VariantZero v2
+            
+            ArrayRedim p_Array, x + 1&, True
         
-        Loop While i < u
-        
-        VariantZero v1
-        VariantZero v2
-        
-        ArrayRedim p_Array, x + 1&, True
+        End If
     
     End If
 
@@ -374,74 +392,78 @@ Public Function Sort(Optional ByVal Descending As Boolean, Optional ByVal StartI
         
         e = p_Array.uBounds(0).lElements + L_NG
         
-        If StartIndex > 0& And StartIndex <= e Then s = StartIndex
-        If EndIndex >= s And EndIndex <= e Then e = EndIndex
-        
-        u = (s + e) \ 2&
-        
-        VariantSetType p, p_Array.lVarType
-        
-        If ArrayElementGet(p_Array, u, p) Then
+        If e >= 0& Then
             
-            VariantSetType v1, p_Array.lVarType
-            VariantSetType v2, p_Array.lVarType
+            If StartIndex > 0& And StartIndex <= e Then s = StartIndex
+            If EndIndex >= s And EndIndex <= e Then e = EndIndex
             
-            i = s
-            j = e
+            u = (s + e) \ 2&
             
-            While i <= j
+            VariantSetType p, p_Array.lVarType
+            
+            If ArrayElementGet(p_Array, u, p) Then
                 
-                Do
+                VariantSetType v1, p_Array.lVarType
+                VariantSetType v2, p_Array.lVarType
+                
+                i = s
+                j = e
+                
+                While i <= j
                     
+                    Do
+                        
+                        u = i
+                        
+                        ArrayElementGet p_Array, u, v1
+                        
+                        If ((Descending = False And v1 < p) Or (Descending = True And v1 > p)) And i < e Then i = i + 1& Else Exit Do
+                    
+                    Loop
+                    
+                    Do
+                        
+                        u = j
+                        
+                        ArrayElementGet p_Array, u, v2
+                        
+                        If ((Descending = False And p < v2) Or (Descending = True And p > v2)) And j > s Then j = j + L_NG Else Exit Do
+                    
+                    Loop
+                    
+                    If i <= j Then
+                        
+                        ArrayElementSet p_Array, u, v1
+                        u = i
+                        ArrayElementSet p_Array, u, v2
+                        
+                        i = i + 1&
+                        j = j + L_NG
+                    
+                    End If
+                
+                Wend
+                
+                VariantZero v1
+                VariantZero v2
+                
+                If s < j Then
+                    u = s
+                    Sort Descending, u, j
+                End If
+                
+                If i < e Then
                     u = i
-                    
-                    ArrayElementGet p_Array, u, v1
-                    
-                    If ((Descending = False And v1 < p) Or (Descending = True And v1 > p)) And i < e Then i = i + 1& Else Exit Do
-                
-                Loop
-                
-                Do
-                    
-                    u = j
-                    
-                    ArrayElementGet p_Array, u, v2
-                    
-                    If ((Descending = False And p < v2) Or (Descending = True And p > v2)) And j > s Then j = j + L_NG Else Exit Do
-                
-                Loop
-                
-                If i <= j Then
-                    
-                    ArrayElementSet p_Array, u, v1
-                    u = i
-                    ArrayElementSet p_Array, u, v2
-                    
-                    i = i + 1&
-                    j = j + L_NG
-                
+                    Sort Descending, u, e
                 End If
             
-            Wend
-            
-            VariantZero v1
-            VariantZero v2
-            
-            If s < j Then
-                u = s
-                Sort Descending, u, j
             End If
             
-            If i < e Then
-                u = i
-                Sort Descending, u, e
-            End If
+            VariantZero p
+            
+            p_Array.bSorted = True
         
         End If
-        
-        VariantZero p
-        
-        p_Array.bSorted = True
     
     End If
 
