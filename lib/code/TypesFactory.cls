@@ -13,11 +13,13 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
 Option Explicit
 
+'METHODS
+
 Public Function NewArray(ByRef Value As Variant) As ArrayEx
     
     Set NewArray = New ArrayEx
     
-    NewArray.Value = Value
+    NewArray.Parse Value
 
 End Function
 
@@ -81,7 +83,7 @@ Public Function NewList(ByRef Value As Variant) As ListEx
     
     Set NewList = New ListEx
     
-    NewList.Value = Value
+    NewList.Parse Value
 
 End Function
 
