@@ -91,9 +91,57 @@ Public Property Get Capacity() As Long
 
 End Property
 
+Public Property Get Equals(ByRef CompareString As String, Optional ByVal CompareMethod As VbCompareMethod) As Long
+    
+    Dim l As Long
+    
+    l = Len(CompareString)
+    
+    If p_ValueLen > l Then
+        
+        Equals = 1&
+    
+    ElseIf p_ValueLen < l Then
+        
+        Equals = L_NG
+    
+    ElseIf p_ValueLen > 0& And l > 0& Then
+        
+        If PUB_UNICODE Then Equals = CompareStringW(0&, (CompareMethod > 0&) * L_NG, p_ValuePtr, p_ValueLen, StrPtr(CompareString), p_ValueLen) - 2& Else Equals = CompareStringA(0&, (CompareMethod > 0&) * L_NG, p_Value, p_ValueLen, CompareString, p_ValueLen) - 2&
+    
+    End If
+
+End Property
+
 Public Property Get HashCode() As Long
     
     If CryptCreate Then HashCode = p_CryptHash
+
+End Property
+
+Public Property Get IndexOf(ByRef SearchString As String, Optional ByVal Start As Long, Optional ByVal Reverse As Boolean, Optional ByVal CompareMethod As VbCompareMethod) As Long
+    
+    Dim x As Long
+    
+    If p_ValueLen > 0& And Len(SearchString) > 0& Then
+        
+        If Reverse Then
+            
+            If Start > 0& And Start < p_ValueLen Then x = Start Else x = p_ValueLen
+            
+            IndexOf = InStrRev(p_Value, SearchString, x, CompareMethod)
+        
+        Else
+            
+            If Start > 0& Then x = Start Else x = 1&
+            
+            x = InStr(x, p_Value, SearchString, CompareMethod)
+            
+            If x <= p_ValueLen Then IndexOf = x
+        
+        End If
+    
+    End If
 
 End Property
 
@@ -279,28 +327,6 @@ Public Function Clone() As StringEx
 
 End Function
 
-Public Function Compare(ByRef CompareString As String, Optional ByVal CompareMethod As VbCompareMethod) As Long
-    
-    Dim l As Long
-    
-    l = Len(CompareString)
-    
-    If p_ValueLen > l Then
-        
-        Compare = 1&
-    
-    ElseIf p_ValueLen < l Then
-        
-        Compare = L_NG
-    
-    ElseIf p_ValueLen > 0& And l > 0& Then
-        
-        If PUB_UNICODE Then Compare = CompareStringW(0&, (CompareMethod > 0&) * L_NG, p_ValuePtr, p_ValueLen, StrPtr(CompareString), p_ValueLen) - 2& Else Compare = CompareStringA(0&, (CompareMethod > 0&) * L_NG, p_Value, p_ValueLen, CompareString, p_ValueLen) - 2&
-    
-    End If
-
-End Function
-
 Public Function Concat(ByRef ConcatString As String) As StringEx
     
     Dim l As Long
@@ -375,32 +401,6 @@ Public Function Encrypt() As StringEx
     Set Encrypt = Me
     
     If CryptCreate And p_ValueLen Then CryptEncrypt p_CryptKey, 0&, 1&, 0&, ByVal p_ValuePtr, p_ValueLen * 2&, p_ValueLenReal * 2&
-
-End Function
-
-Public Function Find(ByRef SearchString As String, Optional ByVal Start As Long, Optional ByVal Reverse As Boolean, Optional ByVal CompareMethod As VbCompareMethod) As Long
-    
-    Dim x As Long
-    
-    If p_ValueLen > 0& And Len(SearchString) > 0& Then
-        
-        If Reverse Then
-            
-            If Start > 0& And Start < p_ValueLen Then x = Start Else x = p_ValueLen
-            
-            Find = InStrRev(p_Value, SearchString, x, CompareMethod)
-        
-        Else
-            
-            If Start > 0& Then x = Start Else x = 1&
-            
-            x = InStr(x, p_Value, SearchString, CompareMethod)
-            
-            If x <= p_ValueLen Then Find = x
-        
-        End If
-    
-    End If
 
 End Function
 

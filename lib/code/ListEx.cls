@@ -373,6 +373,43 @@ Public Function Resize(ByVal NewUpperBound As Long) As ListEx
 
 End Function
 
+Public Function Reverse() As ListEx
+    
+    Dim i As Long
+    Dim u As Long
+    Dim v1 As Variant
+    Dim v2 As Variant
+    
+    Set Reverse = Me
+    
+    If p_Array.lPointer Then
+        
+        u = p_Array.uBounds(0).lElements + L_NG
+        
+        If u Then
+            
+            VariantSetType v1, p_Array.lVarType
+            VariantSetType v2, p_Array.lVarType
+            
+            For i = 0& To u \ 2& - ((u + 1&) Mod 2)
+                
+                ArrayElementGet p_Array, i, v1
+                ArrayElementGet p_Array, u - i, v2
+                
+                ArrayElementSet p_Array, i, v2
+                ArrayElementSet p_Array, u - i, v1
+            
+            Next i
+            
+            VariantZero v1
+            VariantZero v2
+        
+        End If
+    
+    End If
+
+End Function
+
 Public Function Sort(Optional ByVal Descending As Boolean, Optional ByVal StartIndex As Long = L_NG, Optional ByVal EndIndex As Long = L_NG) As ListEx
     
     On Error GoTo ErrHandler
